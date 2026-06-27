@@ -6,37 +6,36 @@ from bs4 import BeautifulSoup
 
 baseurl = 'https://www.thewhiskyexchange.com'
 
-# scraper inteligente que hereda comportamientos de un navegador
 scraper = cloudscraper.create_scraper()
-# pition through the scraper 
+
 r = scraper.get('https://www.thewhiskyexchange.com/c/35/japanese-whisky')
 
-# check server response
 print(r.status_code)
 print(r.url)
 print(r.text[:500])
 
 soup = BeautifulSoup(r.content, 'lxml')
 
-# buscamos productos en las tarjetas actuales de la web
 productlist = soup.find_all('li', class_='product-grid__item')
 
 productlinks = []
 
 for item in productlist:
-    for link in item.find_all('a', href=True): # then inside it we ar elooking for an a
+    for link in item.find_all('a', href=True): then inside it we ar elooking for an a
         print(link['href'])
 '''
-# url detects that request is from an authomated script and blocks the connection silently
-# las tarjetas de producto no usan la clase genrica div item, sino una clase mas especifica llamada li.product-grid_item
-# la pagina usa Cloudflare avanzado. bloque la libreria requests al instante. voy a cambiarla por curl_cffi
-# lets check what I actually receive from the server
-# Cloudflare sigue interceptando el script
-# voy a usar cloudscrapper. 
-# I have two options: Playwright or JSON endpoints
-# I will try with JSON first as it seems easier to me now.
-# no JSON
+url detects that request is from an authomated script and blocks the connection silently
+ las tarjetas de producto no usan la clase genrica div item, sino una clase mas especifica llamada li.product-grid_item
+ la pagina usa Cloudflare avanzado. bloque la libreria requests al instante. voy a cambiarla por curl_cffi
+ lets check what I actually receive from the server
+Cloudflare sigue interceptando el script
+voy a usar cloudscrapper. 
+ I have two options: Playwright or JSON endpoints
+I will try with JSON first as it seems easier to me now.
+no JSON
+
 # using Playwright
+
 '''
 from playwright.sync_api import sync_playwright
 from playwright_stealth import Stealth
@@ -46,12 +45,11 @@ import time
 baseurl = 'https://www.thewhiskyexchange.com'
 
 with sync_playwright() as p:
-    browser = p.chromium.launch(headless=False, channel="chrome")  # Launch Chrome instead of Chromium
+    browser = p.chromium.launch(headless=False, channel="chrome")  Launch Chrome instead of Chromium
 
-    # configuramos variables de ususario reales
     context = browser.new_context(
         user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        locale="en-GB", # because the site is uk based
+        locale="en-GB", because the site is uk based
         viewport={"width": 1280, "height": 720},
         extra_http_headers={
             "Accept-Language": "en-GB,en;q=0.9",
@@ -59,23 +57,20 @@ with sync_playwright() as p:
             "Referrer": "https://www.google.com/",
         }
     )
-    page = context.new_page() # context instead of browser
+    page = context.new_page() context instead of browser
 
-    # aplicamos el sigilo antes de abrir la pagina web
     stealth = Stealth()
     stealth.apply_stealth_sync(page)
 
-    # Step 1: Visit the homepage first
     page.goto("https://www.thewhiskyexchange.com")
-    time.sleep(5)  # Wait for a few seconds to mimic human behavior
+    time.sleep(5)  Wait for a few seconds to mimic human behavior
     response = page.goto(
         "https://www.thewhiskyexchange.com/c/35/japanese-whisky"
         #wait_until="networkidle"
     )
-    time.sleep(5)  # Wait for a few seconds to mimic human behavior
+    time.sleep(5)  Wait for a few seconds to mimic human behavior
 
-    # check server response
-    print("Status:", response.status)   # e.g. 200
+    print("Status:", response.status)   e.g. 200
     print("URL:", page.url)             
     #page.wait_for_selector("li.product-grid__item", timeout=15000)
     html = page.content()
@@ -90,26 +85,28 @@ with sync_playwright() as p:
 
     browser.close()
 '''
-# timeout error
-# on the page there are scripts that are sending data nonstop in loop. I am going to eliminate
-# wait_until='networkidle' so playwright is not going to wait until silence .
-# browser vanilla exposes javascript navigator.webdriver = true
-# I am going to install stealth plugin that eliminates these digital prints.
-# this didnt fully work
+timeout error
+on the page there are scripts that are sending data nonstop in loop. I am going to eliminate
+wait_until='networkidle' so playwright is not going to wait until silence .
+browser vanilla exposes javascript navigator.webdriver = true
+I am going to install stealth plugin that eliminates these digital prints.
+this didnt fully work
 
 # Advansed Approach
-# Step 1: I am going to try to visit the homepage first, then navigate
-# Step 2: Launch with a real chrome instead of chromium
-# Step 3: add delays
-# Step 4: make the browser look more human 
+Step 1: I am going to try to visit the homepage first, then navigate
+Step 2: Launch with a real chrome instead of chromium
+Step 3: add delays
+Step 4: make the browser look more human 
 
-# Nothing helps the site is protected by Cloudflare bot detection.
+Nothing helps the site is protected by Cloudflare bot detection.
 
-# I am going to try to enter manually and copy the cookies.
-# cf_clearance: NjLCTLBAB1wrUDLFyu1c8dSzXPPO3vdBhEoUV94pg54-1782581534-1.2.1.1-pc31VCmvZfEby8klRop_haa2iYZeAa7hV.A9j8NpZe4jLV39a7mXmQ7HSkh6y13bgpbrpgOnAQe2Z8P5s84L5JiafOGNWwg2fi3YPGJQte4wbEFyvJsOYGYHK.wOReJrA.9mlHLGhl3x7zC9yUtg5Xz5S6fd1b2GAZ5JKwpPE9wipSzuKF_0mDBGmC1CdhaK_tr_.EYeYAt_JpwkDx75nttihG0NowSFa1WlIcVGUAuP1FMsKIbVfm5yCk2OsHugZVAMPYz3c0c.Kh9j.V8PFOgM6USRez6U4qlSjkpKMfw129K1062zrzD35Juw1tLa0xQNiBZc1_I6MoHwsdo4B2upTTt9FLBS_SJcfDQeJwDqHX3MMcTzOf1_cMPS4m50dxKzJ6kaa.u4AQTrSMYzCGlke7OBsB6tunO_JSsFFPLR7CABbumS1Qe.ADBtFxi5
+# Manual enter
+I am going to try to enter manually and copy the cookies.
+cf_clearance: NjLCTLBAB1wrUDLFyu1c8dSzXPPO3vdBhEoUV94pg54-1782581534-1.2.1.1-pc31VCmvZfEby8klRop_haa2iYZeAa7hV.A9j8NpZe4jLV39a7mXmQ7HSkh6y13bgpbrpgOnAQe2Z8P5s84L5JiafOGNWwg2fi3YPGJQte4wbEFyvJsOYGYHK.wOReJrA.9mlHLGhl3x7zC9yUtg5Xz5S6fd1b2GAZ5JKwpPE9wipSzuKF_0mDBGmC1CdhaK_tr_.EYeYAt_JpwkDx75nttihG0NowSFa1WlIcVGUAuP1FMsKIbVfm5yCk2OsHugZVAMPYz3c0c.Kh9j.V8PFOgM6USRez6U4qlSjkpKMfw129K1062zrzD35Juw1tLa0xQNiBZc1_I6MoHwsdo4B2upTTt9FLBS_SJcfDQeJwDqHX3MMcTzOf1_cMPS4m50dxKzJ6kaa.u4AQTrSMYzCGlke7OBsB6tunO_JSsFFPLR7CABbumS1Qe.ADBtFxi5
 #__cf_bm: Byv5Px8EzZpekJRxp.1JY2q9MaPk9QOo9YTatPKDS2I-1782581534.2620761-1.0.1.1-IOY496kPUVgD9ihzsaDdE1JePh0ES8OzLiwJaG.A7sHENvCv6O74wG.tYF.eGm5g_XKTpqxs8OdSSCnxVSGVrgZ929pVwdPC_pjM_3MKujRxxTiacrclwwIzRWg8JExW
-# my user_agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36
+my user_agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36
 
+'''
 import requests
 from bs4 import BeautifulSoup
 
@@ -136,7 +133,7 @@ products = soup.select("li.product-grid__item")
 for item in products:
     for link in item.find_all('a', href=True):
         print(link['href'])
-
+'''
 '''
 (myenv) ggg@GiacominoGuardianos-MacBook-Air webscraping_course % python3 whisky.py   
 Status: 200
@@ -165,5 +162,10 @@ Status: 200
 /p/72434/fuji-single-malt-whisky
 /p/72433/fuji-single-grain-whiskey
 '''
-# this approach worked. I will be satisfied for now. It wont work for automated search, just for casual scrapping, but for now and for this project I dont need more. 
-# note: these credentials expire in minutes.
+this approach worked. I will be satisfied for now. It wont work for automated search, just for casual scrapping, but for now and for this project I dont need more. 
+note: these credentials expire in minutes.
+
+# Next 
+
+Adding loop through 6 pages
+

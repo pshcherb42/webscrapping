@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 
+baseurl = "https://www.thewhiskyexchange.com"
+
 headers = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
@@ -9,21 +11,26 @@ headers = {
 }
 
 cookies = {
-    "cf_clearance": "IcGMXkgb4riGLDsqCKCBGe2TiDbN2Fwlb4a3u0_Aij4-1782582387-1.2.1.1-Yk3RHhT6wkB6gVcAI0LnZja4AacMHv8ND4CWO4t1AIIsl_qBBYujysLKU39e66sGcIKOvNAUTLZXmFzYuaP0HlU6hq4dbSmMfLGeT0MO40AtLqXHWwPsvw6VTc8rjUI02Sd_FgI.8z8UiJ5j4hCZcFj1EtT9ZCWO.af0mIXbOIcUHA5fm7dkd0FX9YAu0Obymq_RyK95pTy_qmlipDnKHeXlE7xPBnhEGjfjkrB4XkizAXwhYaZ8pJ.a5Mw.lU4SX9GYZENKBoq01fA32Mpupeg4f1hrNG1nzMWbUaCZVUM127rHzewn14rgXw3OwdDVat2wH.hd2JiqwI6oEucHR2f0FVg9VKiO8Ec5HrZ7D8ije861zgyQ0UTnvhEgVPthwwo6OH7mngR2SRsCz0M6.4_qLisGXHAA0JJvqwiFvQNYOFABoQYRmEFyqqGp9XEW",
-    "__cf_bm": "A_QpSpKHg5wHQnr4ILhRSB4uZiTbGJdwKZ53oFeHSbA-1782582387.597306-1.0.1.1-nQTOwgVEjpiu1qSHuAeu_uqquPBFtZNfZZE5e_naZrzOiQusfTpKWXOapR5nMCcQX7qiMm8N703ZuXHFup.aLZ7Jco3rsfOVu_uI45V3jgNOjK2lnDba5GEvBAuBEGc8",
+    "cf_clearance": "9hH8DL4VlmwW7wDj_9vptOqzGOUhrNcDCGyS7QX_Ieo-1782585430-1.2.1.1-SuKopPPLbOdK5B7i9AgqYMiRDABdZCzRjSmf7oKOb15w1cn2esiw9CM9YZ83ehP5Fis4cCmB6wlre5EEzC_7EYWAhA7hVFmNRSzgXloW0LOeTNL3C7vWhjkJc5fQ4X5iZTMMxbmFA9ESbHPkrGi0ONNCs9VUL.yHUoiH8LMflfg0tW3fy52zUHeJ3NAoIQBsdqoskF9Bk8zLfFm0zmuoJbF2ixa9L0n7HXd9SxsfYp5w8Gg3yZEigYHC_0G5_fRPQkz6n8XzplT5HHeySbu6dGJxfk5sqZx3Jl7Vzyis_jyFIu_MQKSUuY2MZ0hnuYc1pBPboaqS4c9QCX6ZO4wSBLqJjgjkVkcbX1shGlWKTM0XCXq14RcsHj1leKu8NeWK_BMtMuxnJOLQlsXr4hGSLhXlPzZIwrgAxR864iaR070tKLLaLjfETFHQzjzjOW75",
+    "__cf_bm": "iGwHvERs.yAUqbdolt4MStXRMWIHOqVrxUlIO0sNxAA-1782585430.0401814-1.0.1.1-Gfy2Eoc17mRl7FncB0inAmQP4PzVUx1ZVzCcgafmuMlfYlw7qxFtR61cmCAs.GBBtknw2gbP4CgaQKf3ieIG.x1w.9gL.btxQnq.KEzs.z6VL_Arj7c2jkMs_k359UGa",
 }
 
-url = "https://www.thewhiskyexchange.com/c/35/japanese-whisky"
+productlinks = []
 
-response = requests.get(url, headers=headers, cookies=cookies)
-print("Status:", response.status_code)
+for x in range(1, 6):
+    url = f"https://www.thewhiskyexchange.com/c/35/japanese-whisky?pg={x}"
 
-soup = BeautifulSoup(response.text, "lxml")
-products = soup.select("li.product-grid__item")
+    response = requests.get(url, headers=headers, cookies=cookies)
+    print("Status:", response.status_code)
 
-for item in products:
-    for link in item.find_all('a', href=True):
-        print(link['href'])
+    soup = BeautifulSoup(response.text, "lxml")
+    products = soup.select("li.product-grid__item")
+    
+    for item in products:
+        for link in item.find_all('a', href=True):
+            productlinks.append(baseurl + link['href'])
+
+print(len(productlinks))
 
 '''
 (myenv) ggg@GiacominoGuardianos-MacBook-Air webscraping_course % python3 whisky.py   
@@ -53,3 +60,4 @@ Status: 200
 /p/72434/fuji-single-malt-whisky
 /p/72433/fuji-single-grain-whiskey
 '''
+
