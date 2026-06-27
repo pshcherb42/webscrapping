@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import pandas as pd
 
 baseurl = "https://www.thewhiskyexchange.com"
 
@@ -11,8 +12,8 @@ headers = {
 }
 
 cookies = {
-    "cf_clearance": "9hH8DL4VlmwW7wDj_9vptOqzGOUhrNcDCGyS7QX_Ieo-1782585430-1.2.1.1-SuKopPPLbOdK5B7i9AgqYMiRDABdZCzRjSmf7oKOb15w1cn2esiw9CM9YZ83ehP5Fis4cCmB6wlre5EEzC_7EYWAhA7hVFmNRSzgXloW0LOeTNL3C7vWhjkJc5fQ4X5iZTMMxbmFA9ESbHPkrGi0ONNCs9VUL.yHUoiH8LMflfg0tW3fy52zUHeJ3NAoIQBsdqoskF9Bk8zLfFm0zmuoJbF2ixa9L0n7HXd9SxsfYp5w8Gg3yZEigYHC_0G5_fRPQkz6n8XzplT5HHeySbu6dGJxfk5sqZx3Jl7Vzyis_jyFIu_MQKSUuY2MZ0hnuYc1pBPboaqS4c9QCX6ZO4wSBLqJjgjkVkcbX1shGlWKTM0XCXq14RcsHj1leKu8NeWK_BMtMuxnJOLQlsXr4hGSLhXlPzZIwrgAxR864iaR070tKLLaLjfETFHQzjzjOW75",
-    "__cf_bm": "iGwHvERs.yAUqbdolt4MStXRMWIHOqVrxUlIO0sNxAA-1782585430.0401814-1.0.1.1-Gfy2Eoc17mRl7FncB0inAmQP4PzVUx1ZVzCcgafmuMlfYlw7qxFtR61cmCAs.GBBtknw2gbP4CgaQKf3ieIG.x1w.9gL.btxQnq.KEzs.z6VL_Arj7c2jkMs_k359UGa",
+    "cf_clearance": "zM.opTH1IRkQAVzxPZDN73uTn6vX.dRWF0EToyqBXdA-1782588361-1.2.1.1-BjNIBD_ihhXiGfK05GTG4CLtX4Z5vV4CAhN8MfB.KVrEmu2nKmHKk_ZYYM4.m_0id57XSdaCyVCXkmFzuiQH4pYSec1KA0a0kNnt49t3fEuBYAzzOfqJ2OjOIrKDKxPDnv24VmTtJdWkAf8XNG5QG6y9QAdQUNDrjT9cLBqBt0EFXA_PKofMdAEXGYUViYn8Fq6jJ8VSkV0659kKjN7o1b_e_mDdcx3aQ48mM..r0Lw1L51_cmlFQ6jQX6tIiKUMzjpConuy4BaObCO7H5tlBS_cOT4nTNiA1wdiueUi76rS2X6cnVX0uSp0GuYZ2rSqpyoVRU7UjTtp4Auesr.L5qih6PdWJsGPl7ZBOFncp3uTJ7h8nHD5JdWI5aR0_S8DJhQ9jS3FSbTd8xrYWgSbL8qusDHOoQwfLBqnuj_0Z3Epqda7n7LL9UQ7ybxS5.LP",
+    "__cf_bm": ".IFRBwVCGvhUZX75IBJILUQFLaoVmXOD8agQeY_2tbI-1782588361.8566532-1.0.1.1-2iRemig9PO4O06fWrQReHnxAr5wEn10vpqSTnzg08pja65G3KoMxwUmQuzN43w.k.qTmcGjl0R6GxXQlBCaRCnmdojl3OVUgzy2JsiiJ_WLDIVIWvXwyVZ9NloohRQ8F",
 }
 
 productlinks = []
@@ -30,34 +31,37 @@ for x in range(1, 6):
         for link in item.find_all('a', href=True):
             productlinks.append(baseurl + link['href'])
 
-print(len(productlinks))
+# testlink = 'https://www.thewhiskyexchange.com/p/62322/matsui-sakura-kurayoshi-distillery'
 
-'''
-(myenv) ggg@GiacominoGuardianos-MacBook-Air webscraping_course % python3 whisky.py   
-Status: 200
-/p/29388/hibiki-harmony
-/p/2940/yamazaki-12-year-old
-/p/36362/suntory-toki
-/p/23771/hakushu-distillers-reserve
-/p/70564/chichibu-the-peated-2022
-/p/80949/chichibu-red-wine-cask-2023
-/p/23772/yamazaki-distillers-reserve
-/p/72178/kanosuke-single-malt
-/p/23928/nikka-coffey-grain-whisky
-/p/44246/suntory-toki-black
-/p/81244/kanosuke-hioki-pot-still
-/p/73019/fuji-single-blended-whisky
-/p/47669/ichiros-malt-double-distilleries-465
-/p/63405/the-house-of-suntory-trilogy-pack-3x20cl
-/p/82003/akashi-blended-sherry-cask-finish
-/p/68390/togouchi-single-malt
-/p/71847/yamazaki-12-year-old-100th-anniversary
-/p/81705/yamazaki-18-year-old-gift-box
-/p/85890/chichibu-distillery-ii
-/p/32762/miyagikyo-single-malt
-/p/32761/yoichi-single-malt
-/p/81835/kanosuke-2020-1st-fill-bourbon-cask-20496-exclusive-to-the-whisky-exchange
-/p/72434/fuji-single-malt-whisky
-/p/72433/fuji-single-grain-whiskey
-'''
+whiskylist = []
+for link in productlinks:
+    r = requests.get(link, headers=headers, cookies=cookies)
 
+    soup = BeautifulSoup(r.content, 'lxml')
+
+    name = soup.find('h1', class_='product-main__name').text.strip()
+    price = soup.find('p', class_='product-action__price').text.strip()
+    description = soup.find('div', class_='product-main__description').text.strip()
+    try:
+        stock = soup.find('p', class_='product-action__stock product-action__stock--instock').text.strip()
+    except:
+        stock = "Stock information not available"
+
+    try:
+        rating = soup.find('div', class_='review-overview__rating star-rating star-rating--30').text.strip()
+    except:
+        rating = "No rating available"
+
+    whisky = {
+        'name': name,
+        'rating': rating,
+        'price': price,
+        'stock': stock,
+        'description': description
+    }
+
+    whiskylist.append(whisky)
+    print('Saving whisky: ', whisky['name'])
+
+df = pd.DataFrame(whiskylist)
+print(df.head(15))

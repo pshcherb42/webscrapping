@@ -155,7 +155,12 @@ this approach worked. I will be satisfied for now. It wont work
 for automated search, just for casual scrapping, but for now and for this project I dont need more. 
 note: these credentials expire in minutes.
 
-# Next 
+# Parse each page
 
 Adding loop through 6 pages
+Testing to retrieve information from one page only.
+name, rating, reviews, price.
+
+# Setting the database to save the results
+
 
