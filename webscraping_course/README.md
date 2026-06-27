@@ -163,4 +163,10 @@ name, rating, reviews, price.
 
 # Setting the database to save the results
 
+Using panda.
 
+# My little additions
+
+stock information
+
+description
