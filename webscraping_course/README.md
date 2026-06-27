@@ -161,6 +161,57 @@ Adding loop through 6 pages
 Testing to retrieve information from one page only.
 name, rating, reviews, price.
 
+    productlinks = []
+
+    for x in range(1, 6):
+        url = f"https://www.thewhiskyexchange.com/c/35/japanese-whisky?pg={x}"
+
+        response = requests.get(url, headers=headers, cookies=cookies)
+        print("Status:", response.status_code)
+
+        soup = BeautifulSoup(response.text, "lxml")
+        products = soup.select("li.product-grid__item")
+        
+        for item in products:
+            for link in item.find_all('a', href=True):
+                productlinks.append(baseurl + link['href'])
+
+    # testlink = 'https://www.thewhiskyexchange.com/p/62322/matsui-sakura-kurayoshi-distillery'
+
+    whiskylist = []
+    for link in productlinks:
+        r = requests.get(link, headers=headers, cookies=cookies)
+
+        soup = BeautifulSoup(r.content, 'lxml')
+
+        name = soup.find('h1', class_='product-main__name').text.strip()
+        price = soup.find('p', class_='product-action__price').text.strip()
+        description = soup.find('div', class_='product-main__description').text.strip()
+        try:
+            stock = soup.find('p', class_='product-action__stock product-action__stock--instock').text.strip()
+        except:
+            stock = "Stock information not available"
+
+        try:
+            rating = soup.find('div', class_='review-overview__rating star-rating star-rating--30').text.strip()
+        except:
+            rating = "No rating available"
+
+        whisky = {
+            'name': name,
+            'rating': rating,
+            'price': price,
+            'stock': stock,
+            'description': description
+        }
+
+        whiskylist.append(whisky)
+        print('Saving whisky: ', whisky['name'])
+
+    df = pd.DataFrame(whiskylist)
+    print(df.head(15))
+
+
 # Setting the database to save the results
 
 Using panda.
@@ -170,3 +221,5 @@ Using panda.
 stock information
 
 description
+
+
