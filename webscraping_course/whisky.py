@@ -36,24 +36,46 @@ for item in productlist:
 # no JSON
 # using Playwright
 from playwright.sync_api import sync_playwright
+from playwright_stealth import stealth_sync
 from bs4 import BeautifulSoup
+import time
+
+baseurl = 'https://www.thewhiskyexchange.com'
 
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=False)
 
-    page = browser.new_page()
+    # configuramos variables de ususario reales
+    context = browser.new_context(
+        user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        locale="es-ES",
+        viewport={"width": 1280, "heght": 720}
+    )
+    page = context.new_page() # context instead of browser
+
+    # aplicamos el sigilo antes de abrir la pagina web
+    stealth_sync(page)
 
     page.goto(
-        "https://www.thewhiskyexchange.com/c/35/japanese-whisky",
-        wait_until="networkidle"
+        "https://www.thewhiskyexchange.com/c/35/japanese-whisky"
+        #wait_until="networkidle"
     )
 
+    #page.wait_for_selector("li.product-grid__item", timeout=15000)
     html = page.content()
 
     soup = BeautifulSoup(html, "lxml")
 
     products = soup.select("li.product-grid__item")
 
-    print(len(products))
+    for item in products:
+        for link in item.find_all('a', href=True):
+            print(link['href'])
 
     browser.close()
+
+# timeout error
+# on the page there are scripts that are sending data nonstop in loop. I am going to eliminate
+# wait_until='networkidle' so playwright is not going to wait until silence .
+# browser vanilla exposes javascript navigator.webdriver = true
+# I am going to install stealth plugin that eliminates these digital prints.
