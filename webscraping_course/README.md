@@ -223,3 +223,22 @@ stock information
 description
 
 
+# helpers
+
+good to find differences in divs
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        pw_page = browser.new_page()
+        pw_page.goto(testlink)
+        pw_page.wait_for_selector('div.py-2.text-sm.uppercase', timeout=10000)
+        
+        # Dump all text + class from every div to find quantity
+        divs = pw_page.locator('div').all()
+        for div in divs:
+            text = div.inner_text().strip()
+            cls = div.get_attribute('class') or ''
+            if text and len(text) < 60:  # skip huge blocks
+                print(repr(text), '|', cls)
+        
+        browser.close()
