@@ -32,15 +32,30 @@ So here is everything that I've done so far
             print(link['href'])
         
 
+But this doesnt work because:
 
 url detects that request is from an authomated script and blocks the connection silently
- las tarjetas de producto no usan la clase genrica div item, sino una clase mas especifica llamada li.product-grid_item
- la pagina usa Cloudflare avanzado. bloque la libreria requests al instante. voy a cambiarla por curl_cffi
- lets check what I actually receive from the server
+
+las tarjetas de producto no usan la clase generica div item, sino una clase mas especifica llamada li.product-grid_item
+
+la pagina usa Cloudflare avanzado. bloque la libreria requests al instante. voy a cambiarla por curl_cffi
+
+Pero eso tampoco ha ayudado.
+
+lets check what I actually receive from the server
+
 Cloudflare sigue interceptando el script
+
 voy a usar cloudscrapper. 
- I have two options: Playwright or JSON endpoints
+
+tampoco ha funcionado.
+
+I have two options: Playwright or JSON endpoints
+
 I will try with JSON first as it seems easier to me now.
+
+No ayuda tampoco 
+
 no JSON
 
 # using Playwright
@@ -94,14 +109,20 @@ no JSON
 
         browser.close()
 
-timeout error
+timeout error otra vez
+
 on the page there are scripts that are sending data nonstop in loop. I am going to eliminate
+
 wait_until='networkidle' so playwright is not going to wait until silence .
+
 browser vanilla exposes javascript navigator.webdriver = true
+
 I am going to install stealth plugin that eliminates these digital prints.
+
 this didnt fully work
 
 # Advansed Approach
+
 Step 1: I am going to try to visit the homepage first, then navigate
 
 Step 2: Launch with a real chrome instead of chromium
@@ -113,7 +134,8 @@ Step 4: make the browser look more human
 Nothing helps the site is protected by Cloudflare bot detection.
 
 # Manual enter
-I am going to try to enter manually and copy the cookies.
+
+I am going to try to enter manually and copy the cookies:
 
 cf_clearance: 
 
