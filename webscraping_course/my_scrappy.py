@@ -23,6 +23,7 @@ for x in range(0, 6):
             productlinks.append(baseurl + link['href'])
 
 #testlink = 'https://www.roastar.com/get-quote#product=58'
+# it's a Nuxt.js app (notice /_nuxt/ in the script tags). The HTML shell has no product data
 coffeelist = []
 with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
